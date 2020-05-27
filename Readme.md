@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Анна Пронина](https://up.htmlacademy.ru/javascript/20/user/449831).
-* Наставник: `Неизвестно`.
+* Наставник: [Екатерина Кащенко](https://up.htmlacademy.ru/javascript/20/user/109008).
 
 ---
 
