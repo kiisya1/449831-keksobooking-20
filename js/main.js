@@ -11,6 +11,8 @@ var LOCATION_Y_MAX = 630;
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
 var LOCATION_X_MIN = 0;
+var GUESTS_DECLENSIONS = ['гостя', 'гостей'];
+var ROOMS_DECLENSIONS = ['комната', 'комнаты', 'комнат'];
 
 var map = document.querySelector('.map');
 var locationXMax = map.offsetWidth;
@@ -115,20 +117,6 @@ var makeMapActive = function () {
   map.classList.remove('map--faded');
 };
 
-// Определяет тип жилья в объявлении
-
-var getHousingType = function (type) {
-  if (type === 'flat') {
-    return 'Квартира';
-  } else if (type === 'bungalo') {
-    return 'Бунгало';
-  } else if (type === 'house') {
-    return 'Дом';
-  } else {
-    return 'Дворец';
-  }
-};
-
 // Скрывает html элемент
 
 var hideHtmlElement = function (htmlElement) {
@@ -139,103 +127,118 @@ var hideHtmlElement = function (htmlElement) {
 
 var addPhotosToAd = function (adPhotos, photos) {
   var adImg = adPhotos.querySelector('.popup__photo');
+  adPhotos.innerHTML = '';
   var fragment = document.createDocumentFragment();
-  if (photos.length > 0) {
-    photos.forEach(function (photo, i) {
-      if (i === 0) {
-        adImg.src = photo;
-      } else {
-        var adImgElement = adImg.cloneNode(true);
-        adImgElement.src = photo;
-        fragment.appendChild(adImgElement);
-      }
-    });
-    adPhotos.appendChild(fragment);
-  } else {
-    hideHtmlElement(adPhotos);
-  }
+
+  photos.forEach(function (photo) {
+    var adImgElement = adImg.cloneNode(true);
+    adImgElement.src = photo;
+    fragment.appendChild(adImgElement);
+  });
+  adPhotos.appendChild(fragment);
 };
 
 // Добавляет текст в элементы разметки объявления
 
 var addTextToElement = function (htmlElement, text) {
-  if (text) {
-    htmlElement.textContent = text;
-  } else {
-    hideHtmlElement(htmlElement);
-  }
+  htmlElement.textContent = text;
 };
 
 // Добавляет цену в объявление
 
 var addPriceToAd = function (adPrice, price) {
-  if (price) {
-    adPrice.textContent = price + '₽/ночь';
-  } else {
-    hideHtmlElement(adPrice);
-  }
+  adPrice.textContent = price + '₽/ночь';
 };
 
 // Добавляет тип жилья в объявление
 
 var addTypeToAd = function (adType, type) {
-  if (type) {
-    adType.textContent = getHousingType(type);
+  var typesMap = {
+    'flat': 'Квартира',
+    'bungalo': 'Бунгало',
+    'house': 'Дом',
+    'palace': 'Дворец'
+  };
+  adType.textContent = typesMap[type];
+};
+
+// Определяет склонение "комнат" в зависимости от числа
+
+var declineRooms = function (rooms) {
+  if ((rooms % 100 > 4 && rooms % 100 < 20) || rooms % 10 === 0 || rooms % 10 >= 5) {
+    return ROOMS_DECLENSIONS[2];
+  } else if (rooms % 10 < 5 && rooms % 10 > 1) {
+    return ROOMS_DECLENSIONS[1];
   } else {
-    hideHtmlElement(adType);
+    return ROOMS_DECLENSIONS[0];
+  }
+};
+
+// Определяет склонение "гостей" в зависимости от числа
+
+var declineGuests = function (guests) {
+  if (guests % 10 !== 1 || guests % 100 === 11) {
+    return GUESTS_DECLENSIONS[1];
+  } else {
+    return GUESTS_DECLENSIONS[0];
   }
 };
 
 // Добавляет количество комнат и гостей в объявление
 
-var addСapacityToAd = function (adСapacity, rooms, guests) {
-  if (rooms && guests) {
-    adСapacity.textContent = rooms + ' комнаты для ' + guests + ' гостей';
-  } else {
-    hideHtmlElement(adСapacity);
-  }
+var addCapacityToAd = function (adCapacity, rooms, guests) {
+  adCapacity.textContent = rooms + ' ' + declineRooms(rooms) + ' для ' + guests + ' ' + declineGuests(guests);
 };
 
 // Добавляет время въезда/выезда в объявление
 
 var addTimesToAd = function (adTiming, checkin, checkout) {
-  if (checkin && checkout) {
-    adTiming.textContent = 'Заезд после ' + checkin + ', выезд до ' + checkout;
-  } else {
-    hideHtmlElement(adTiming);
-  }
+  adTiming.textContent = 'Заезд после ' + checkin + ', выезд до ' + checkout;
 };
 
 // Добавляет аватар в объявление
 
 var addAvatarToAd = function (adAvatar, avatar) {
-  if (avatar) {
-    adAvatar.src = avatar;
-  } else {
-    hideHtmlElement(adAvatar);
-  }
+  adAvatar.src = avatar;
 };
 
 // Добавляет удобства в объявление
 
 var addFeaturesToAd = function (adFeatures, features) {
-  if (features.length > 0) {
-    var fragment = document.createDocumentFragment();
-    var featuresItems = adFeatures.querySelectorAll('.popup__feature');
+  var fragment = document.createDocumentFragment();
+  adFeatures.innerHTML = '';
 
-    features.forEach(function (feature) {
-      var clearItem = document.createElement('li');
-      var featureClass = 'popup__feature--' + feature;
-      clearItem.classList.add('popup__feature', featureClass);
-      fragment.appendChild(clearItem);
-    });
+  features.forEach(function (feature) {
+    var clearItem = document.createElement('li');
+    var featureClass = 'popup__feature--' + feature;
+    clearItem.classList.add('popup__feature', featureClass);
+    fragment.appendChild(clearItem);
+  });
 
-    featuresItems.forEach(function (featuresItem) {
-      featuresItem.remove();
-    });
-    adFeatures.appendChild(fragment);
+  adFeatures.appendChild(fragment);
+};
+
+// Добавляет контент или скрывает элемент если контент пустой
+
+var addContentOrHide = function (htmlElement, callback, content, extraContent) {
+  if (Array.isArray(content)) {
+    if (content.length > 0) {
+      callback(htmlElement, content);
+    } else {
+      hideHtmlElement(htmlElement);
+    }
+  } else if (extraContent !== undefined) {
+    if (content && extraContent) {
+      callback(htmlElement, content, extraContent);
+    } else {
+      hideHtmlElement(htmlElement);
+    }
   } else {
-    hideHtmlElement(adFeatures);
+    if (content) {
+      callback(htmlElement, content);
+    } else {
+      hideHtmlElement(htmlElement);
+    }
   }
 };
 
@@ -250,35 +253,35 @@ var getAdCard = function (ad) {
   var adAdress = adElement.querySelector('.popup__text--address');
   var adPrice = adElement.querySelector('.popup__text--price');
   var adType = adElement.querySelector('.popup__type');
-  var adСapacity = adElement.querySelector('.popup__text--capacity');
+  var adCapacity = adElement.querySelector('.popup__text--capacity');
   var adTiming = adElement.querySelector('.popup__text--time');
   var adFeatures = adElement.querySelector('.popup__features');
   var adDescription = adElement.querySelector('.popup__description');
   var adPhotos = adElement.querySelector('.popup__photos');
   var adAvatar = adElement.querySelector('.popup__avatar');
 
-  addTextToElement(adTitle, ad.offer.title);
-  addTextToElement(adAdress, ad.offer.address);
-  addPriceToAd(adPrice, ad.offer.price);
-  addTypeToAd(adType, ad.offer.type);
-  addСapacityToAd(adСapacity, ad.offer.rooms, ad.offer.guests);
-  addTimesToAd(adTiming, ad.offer.checkin, ad.offer.checkout);
-  addTextToElement(adDescription, ad.offer.description);
-  addAvatarToAd(adAvatar, ad.author.avata);
-  addFeaturesToAd(adFeatures, ad.offer.features);
-  addPhotosToAd(adPhotos, ad.offer.photos);
+  addContentOrHide(adTitle, addTextToElement, ad.offer.title);
+  addContentOrHide(adAdress, addTextToElement, ad.offer.address);
+  addContentOrHide(adPrice, addPriceToAd, ad.offer.price);
+  addContentOrHide(adType, addTypeToAd, ad.offer.type);
+  addContentOrHide(adCapacity, addCapacityToAd, ad.offer.rooms, ad.offer.guests);
+  addContentOrHide(adTiming, addTimesToAd, ad.offer.checkin, ad.offer.checkout);
+  addContentOrHide(adDescription, addTextToElement, ad.offer.description);
+  addContentOrHide(adAvatar, addAvatarToAd, ad.author.avatar);
+  addContentOrHide(adFeatures, addFeaturesToAd, ad.offer.features);
+  addContentOrHide(adPhotos, addPhotosToAd, ad.offer.photos);
 
   return adElement;
 };
 
 // Добавляет карточку объявления на страницу
 
-var renderAd = function (ads) {
-  var mapFilterContainer = map.querySelector('.map__filters-container');
-  map.insertBefore(getAdCard(ads[0]), mapFilterContainer);
+var renderAd = function (ad) {
+  var mapFiltersContainer = map.querySelector('.map__filters-container');
+  map.insertBefore(getAdCard(ad), mapFiltersContainer);
 };
 
 var ads = generateAdvertisementObjects(NUMBER_OF_ADVERTISEMENT);
 makeMapActive();
 renderPins(ads);
-renderAd(ads);
+renderAd(ads[0]);
