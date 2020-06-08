@@ -126,6 +126,9 @@ var hideHtmlElement = function (htmlElement) {
 // Добавляет фотографии в объявление
 
 var addPhotosToAd = function (adPhotos, photos) {
+  if (!photos.length) {
+    return false;
+  }
   var adImg = adPhotos.querySelector('.popup__photo');
   adPhotos.innerHTML = '';
   var fragment = document.createDocumentFragment();
@@ -136,23 +139,35 @@ var addPhotosToAd = function (adPhotos, photos) {
     fragment.appendChild(adImgElement);
   });
   adPhotos.appendChild(fragment);
+  return true;
 };
 
 // Добавляет текст в элементы разметки объявления
 
 var addTextToElement = function (htmlElement, text) {
+  if (!text) {
+    return false;
+  }
   htmlElement.textContent = text;
+  return true;
 };
 
 // Добавляет цену в объявление
 
 var addPriceToAd = function (adPrice, price) {
+  if (!price) {
+    return false;
+  }
   adPrice.textContent = price + '₽/ночь';
+  return true;
 };
 
 // Добавляет тип жилья в объявление
 
 var addTypeToAd = function (adType, type) {
+  if (!type) {
+    return false;
+  }
   var typesMap = {
     'flat': 'Квартира',
     'bungalo': 'Бунгало',
@@ -160,6 +175,7 @@ var addTypeToAd = function (adType, type) {
     'palace': 'Дворец'
   };
   adType.textContent = typesMap[type];
+  return true;
 };
 
 // Определяет склонение "комнат" в зависимости от числа
@@ -187,58 +203,58 @@ var declineGuests = function (guests) {
 // Добавляет количество комнат и гостей в объявление
 
 var addCapacityToAd = function (adCapacity, rooms, guests) {
+  if (!rooms || !guests) {
+    return false;
+  }
   adCapacity.textContent = rooms + ' ' + declineRooms(rooms) + ' для ' + guests + ' ' + declineGuests(guests);
+  return true;
 };
 
 // Добавляет время въезда/выезда в объявление
 
 var addTimesToAd = function (adTiming, checkin, checkout) {
+  if (!checkin || !checkout) {
+    return false;
+  }
   adTiming.textContent = 'Заезд после ' + checkin + ', выезд до ' + checkout;
+  return true;
 };
 
 // Добавляет аватар в объявление
 
 var addAvatarToAd = function (adAvatar, avatar) {
+  if (!avatar) {
+    return false;
+  }
   adAvatar.src = avatar;
+  return true;
 };
 
 // Добавляет удобства в объявление
 
 var addFeaturesToAd = function (adFeatures, features) {
+  if (!features.length) {
+    return false;
+  }
   var fragment = document.createDocumentFragment();
   adFeatures.innerHTML = '';
 
   features.forEach(function (feature) {
-    var clearItem = document.createElement('li');
+    var featureItem = document.createElement('li');
     var featureClass = 'popup__feature--' + feature;
-    clearItem.classList.add('popup__feature', featureClass);
-    fragment.appendChild(clearItem);
+    featureItem.classList.add('popup__feature', featureClass);
+    fragment.appendChild(featureItem);
   });
 
   adFeatures.appendChild(fragment);
+  return true;
 };
 
 // Добавляет контент или скрывает элемент если контент пустой
 
-var addContentOrHide = function (htmlElement, callback, content, extraContent) {
-  if (Array.isArray(content)) {
-    if (content.length > 0) {
-      callback(htmlElement, content);
-    } else {
-      hideHtmlElement(htmlElement);
-    }
-  } else if (extraContent !== undefined) {
-    if (content && extraContent) {
-      callback(htmlElement, content, extraContent);
-    } else {
-      hideHtmlElement(htmlElement);
-    }
-  } else {
-    if (content) {
-      callback(htmlElement, content);
-    } else {
-      hideHtmlElement(htmlElement);
-    }
+var addNotEmptyContent = function (htmlElement, callback, content, extraContent) {
+  if (callback(htmlElement, content, extraContent) === false) {
+    hideHtmlElement(htmlElement);
   }
 };
 
@@ -250,7 +266,7 @@ var getAdCard = function (ad) {
       .querySelector('.map__card');
   var adElement = adTemplate.cloneNode(true);
   var adTitle = adElement.querySelector('.popup__title');
-  var adAdress = adElement.querySelector('.popup__text--address');
+  var adAddress = adElement.querySelector('.popup__text--address');
   var adPrice = adElement.querySelector('.popup__text--price');
   var adType = adElement.querySelector('.popup__type');
   var adCapacity = adElement.querySelector('.popup__text--capacity');
@@ -260,16 +276,16 @@ var getAdCard = function (ad) {
   var adPhotos = adElement.querySelector('.popup__photos');
   var adAvatar = adElement.querySelector('.popup__avatar');
 
-  addContentOrHide(adTitle, addTextToElement, ad.offer.title);
-  addContentOrHide(adAdress, addTextToElement, ad.offer.address);
-  addContentOrHide(adPrice, addPriceToAd, ad.offer.price);
-  addContentOrHide(adType, addTypeToAd, ad.offer.type);
-  addContentOrHide(adCapacity, addCapacityToAd, ad.offer.rooms, ad.offer.guests);
-  addContentOrHide(adTiming, addTimesToAd, ad.offer.checkin, ad.offer.checkout);
-  addContentOrHide(adDescription, addTextToElement, ad.offer.description);
-  addContentOrHide(adAvatar, addAvatarToAd, ad.author.avatar);
-  addContentOrHide(adFeatures, addFeaturesToAd, ad.offer.features);
-  addContentOrHide(adPhotos, addPhotosToAd, ad.offer.photos);
+  addNotEmptyContent(adTitle, addTextToElement, ad.offer.title);
+  addNotEmptyContent(adAddress, addTextToElement, ad.offer.address);
+  addNotEmptyContent(adPrice, addPriceToAd, ad.offer.price);
+  addNotEmptyContent(adType, addTypeToAd, ad.offer.type);
+  addNotEmptyContent(adCapacity, addCapacityToAd, ad.offer.rooms, ad.offer.guests);
+  addNotEmptyContent(adTiming, addTimesToAd, ad.offer.checkin, ad.offer.checkout);
+  addNotEmptyContent(adDescription, addTextToElement, ad.offer.description);
+  addNotEmptyContent(adAvatar, addAvatarToAd, ad.author.avatar);
+  addNotEmptyContent(adFeatures, addFeaturesToAd, ad.offer.features);
+  addNotEmptyContent(adPhotos, addPhotosToAd, ad.offer.photos);
 
   return adElement;
 };
