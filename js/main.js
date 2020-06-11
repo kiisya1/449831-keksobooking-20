@@ -14,8 +14,10 @@ var MAIN_PIN_WIDTH = 65;
 var MAIN_PIN_HEIGHT = 65;
 var MAIN_PIN_HEIGHT_ACTIVE = 87;
 var LOCATION_X_MIN = 0;
+/*
 var GUESTS_DECLENSIONS = ['гостя', 'гостей'];
 var ROOMS_DECLENSIONS = ['комната', 'комнаты', 'комнат'];
+*/
 
 var map = document.querySelector('.map');
 var locationXMax = map.offsetWidth;
@@ -125,6 +127,8 @@ var renderPins = function (ads) {
 
   pinsBlock.appendChild(fragment);
 };
+
+/*
 
 // Скрывает html элемент
 
@@ -306,10 +310,9 @@ var renderAd = function (ad) {
   map.insertBefore(getAdCard(ad), mapFiltersContainer);
 };
 
+renderAd(ads[0]);
 
-// makeMapActive();
-// renderPins(ads);
-// renderAd(ads[0]);
+*/
 
 // Переводит карту в активное состояние
 
