@@ -10,12 +10,29 @@ var LOCATION_Y_MIN = 130;
 var LOCATION_Y_MAX = 630;
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
+var MAIN_PIN_WIDTH = 65;
+var MAIN_PIN_HEIGHT = 65;
+var MAIN_PIN_HEIGHT_ACTIVE = 84;
 var LOCATION_X_MIN = 0;
+/*
 var GUESTS_DECLENSIONS = ['гостя', 'гостей'];
 var ROOMS_DECLENSIONS = ['комната', 'комнаты', 'комнат'];
+*/
 
 var map = document.querySelector('.map');
 var locationXMax = map.offsetWidth;
+
+var adForm = document.querySelector('.ad-form');
+var adFormFieldsets = adForm.querySelectorAll('fieldset');
+var addressField = adForm.querySelector('#address');
+var roomNumberField = adForm.querySelector('#room_number');
+var capacityField = adForm.querySelector('#capacity');
+
+var filterForm = document.querySelector('.map__filters');
+var filterSelects = filterForm.querySelectorAll('select');
+var filterFieldsets = filterForm.querySelectorAll('fieldset');
+
+var mainPin = map.querySelector('.map__pin--main');
 
 // Вычисляет случайное число от min до max
 
@@ -111,11 +128,7 @@ var renderPins = function (ads) {
   pinsBlock.appendChild(fragment);
 };
 
-// Переводит карту в активное состояние
-
-var makeMapActive = function () {
-  map.classList.remove('map--faded');
-};
+/*
 
 // Скрывает html элемент
 
@@ -297,7 +310,168 @@ var renderAd = function (ad) {
   map.insertBefore(getAdCard(ad), mapFiltersContainer);
 };
 
-var ads = generateAdvertisementObjects(NUMBER_OF_ADVERTISEMENT);
-makeMapActive();
-renderPins(ads);
 renderAd(ads[0]);
+
+*/
+
+// Переводит карту в активное состояние
+
+var makeMapActive = function () {
+  map.classList.remove('map--faded');
+};
+
+// Переводит карту в неактивное состояние
+
+var makeMapInactive = function () {
+  map.classList.add('map--faded');
+};
+
+// Переводит форму в активное состояние
+
+var makeAdFormActive = function () {
+  adForm.classList.remove('ad-form--disabled');
+};
+
+// Переводит форму в неактивное состояние
+
+var makeAdFormInactive = function () {
+  adForm.classList.add('ad-form--disabled');
+};
+
+// Убирает у каждого элемента массива атрибут disabled
+
+var makeItemsEnabled = function (items) {
+  items.forEach(function (item) {
+    item.disabled = false;
+  });
+};
+
+// Добавляет каждому элементу массива атрибут disabled
+
+var makeItemsDisabled = function (items) {
+  items.forEach(function (item) {
+    item.disabled = true;
+  });
+};
+
+// Добавляет адрес в поле адреса в соответствии с положением метки
+
+var setPinAddress = function (pinWidth, pinHeight) {
+  var left = mainPin.style.left;
+  var top = mainPin.style.top;
+  addressField.disabled = true;
+  addressField.value = Math.round(+left.slice(0, left.length - 2) + pinWidth / 2) + ', ' + Math.round(+top.slice(0, top.length - 2) + pinHeight);
+};
+
+// Добавляет красную рамку элементам формы
+
+var addRedBorder = function (formElement) {
+  formElement.style.border = '2px solid red';
+};
+
+// Убирает рамку элемента формы
+
+var removeBorder = function (formElement) {
+  formElement.style.border = 'none';
+};
+
+// Проверяет соответсвие значения в поле выбора количества гостей значению количества комнат
+
+var onRoomsAndCapacityChange = function () {
+  var roomsCapacityMap = {
+    '1': {
+      guests: ['1'],
+      errorText: 'В одну комнату можно поселить только одного жильца'
+    },
+    '2': {
+      guests: ['1', '2'],
+      errorText: 'В две комнаты можно поселить только одного или двух жильцов'
+    },
+    '3': {
+      guests: ['1', '2', '3'],
+      errorText: 'Три комнаты могут вместить 1, 2 или 3 жильцов. Значение "не для гостей" недопустимо'
+    },
+    '100': {
+      guests: ['0'],
+      errorText: 'В 100 комнат нельзя селить гостей. Измените значение поля на "не для гостей"'
+    }
+  };
+  var roomsCount = roomNumberField.value;
+  var guestsCount = capacityField.value;
+  if (!roomsCapacityMap[roomsCount].guests.includes(guestsCount)) {
+    addRedBorder(capacityField);
+    capacityField.setCustomValidity(roomsCapacityMap[roomsCount].errorText);
+    return false;
+  } else {
+    removeBorder(capacityField);
+    capacityField.setCustomValidity('');
+    return true;
+  }
+};
+
+// Проверяет какая кнопка мыши нажата и запускает функцию активации карты
+
+var onPinMousedown = function (evt) {
+  if (evt.button === 0) {
+    setActiveMode();
+  }
+};
+
+// Проверяет какая клавиша нажата и запускает функцию активации карты
+
+var onPinKeydown = function (evt) {
+  if (evt.key === 'Enter') {
+    setActiveMode();
+  }
+};
+
+// Проверяет данные перед отправкой
+
+var onAdFormSubmit = function (evt) {
+  evt.preventDefault();
+  if (onRoomsAndCapacityChange()) {
+    adForm.submit();
+  }
+};
+
+
+// Переводит страницу в активный режим
+
+var setActiveMode = function () {
+  makeMapActive();
+  makeAdFormActive();
+  renderPins(ads);
+  makeItemsEnabled(adFormFieldsets);
+  makeItemsEnabled(filterSelects);
+  makeItemsEnabled(filterFieldsets);
+  setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT_ACTIVE);
+
+  mainPin.removeEventListener('mousedown', onPinMousedown);
+  mainPin.removeEventListener('keydown', onPinKeydown);
+
+  adForm.addEventListener('submit', onAdFormSubmit);
+  roomNumberField.addEventListener('change', onRoomsAndCapacityChange);
+  capacityField.addEventListener('change', onRoomsAndCapacityChange);
+};
+
+// Переводит страницу в неактивный режим
+
+var setInactiveMode = function () {
+  setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT / 2);
+  makeMapInactive();
+  makeAdFormInactive();
+  makeItemsDisabled(adFormFieldsets);
+  makeItemsDisabled(filterSelects);
+  makeItemsDisabled(filterFieldsets);
+
+  mainPin.addEventListener('mousedown', onPinMousedown);
+  mainPin.addEventListener('keydown', onPinKeydown);
+
+  adForm.removeEventListener('submit', onAdFormSubmit);
+  roomNumberField.removeEventListener('change', onRoomsAndCapacityChange);
+  capacityField.removeEventListener('change', onRoomsAndCapacityChange);
+};
+
+var ads = generateAdvertisementObjects(NUMBER_OF_ADVERTISEMENT);
+
+setInactiveMode();
