@@ -398,7 +398,7 @@ var onRoomsAndCapacityChange = function () {
   };
   var roomsCount = roomNumberField.value;
   var guestsCount = capacityField.value;
-  if (roomsCapacityMap[roomsCount].guests.indexOf(guestsCount) === -1) {
+  if (!roomsCapacityMap[roomsCount].guests.includes(guestsCount)) {
     addRedBorder(capacityField);
     capacityField.setCustomValidity(roomsCapacityMap[roomsCount].errorText);
     return false;
