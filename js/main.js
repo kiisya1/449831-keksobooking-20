@@ -12,7 +12,7 @@ var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
 var MAIN_PIN_WIDTH = 65;
 var MAIN_PIN_HEIGHT = 65;
-var MAIN_PIN_HEIGHT_ACTIVE = 87;
+var MAIN_PIN_HEIGHT_ACTIVE = 84;
 var LOCATION_X_MIN = 0;
 /*
 var GUESTS_DECLENSIONS = ['гостя', 'гостей'];
@@ -377,41 +377,63 @@ var removeBorder = function (formElement) {
 
 // Проверяет соответсвие значения в поле выбора количества гостей значению количества комнат
 
-var onRoomNumberFieldChange = function () {
-  if (roomNumberField.value === '1') {
-    if (capacityField.value !== '1') {
-      addRedBorder(capacityField);
-      capacityField.setCustomValidity('В одну комнату можно поселить только одного жильца');
-    } else {
-      removeBorder(capacityField);
-      capacityField.setCustomValidity('');
+var onRoomsAndCapacityChange = function () {
+  var roomsCapacityMap = {
+    '1': {
+      guests: ['1'],
+      errorText: 'В одну комнату можно поселить только одного жильца'
+    },
+    '2': {
+      guests: ['1', '2'],
+      errorText: 'В две комнаты можно поселить только одного или двух жильцов'
+    },
+    '3': {
+      guests: ['1', '2', '3'],
+      errorText: 'Три комнаты могут вместить 1, 2 или 3 жильцов. Значение "не для гостей" недопустимо'
+    },
+    '100': {
+      guests: ['0'],
+      errorText: 'В 100 комнат нельзя селить гостей. Измените значение поля на "не для гостей"'
     }
-  } else if (roomNumberField.value === '2') {
-    if (capacityField.value === '3' || capacityField.value === '0') {
-      addRedBorder(capacityField);
-      capacityField.setCustomValidity('В две комнаты можно поселить только одного или двух жильцов');
-    } else {
-      removeBorder(capacityField);
-      capacityField.setCustomValidity('');
-    }
-  } else if (roomNumberField.value === '3') {
-    if (capacityField.value === '0') {
-      addRedBorder(capacityField);
-      capacityField.setCustomValidity('Три комнаты могут вместить 1, 2 или 3 жильцов. Значение "не для гостей" недопустимо');
-    } else {
-      removeBorder(capacityField);
-      capacityField.setCustomValidity('');
-    }
+  };
+  var roomsCount = roomNumberField.value;
+  var guestsCount = capacityField.value;
+  if (roomsCapacityMap[roomsCount].guests.indexOf(guestsCount) === -1) {
+    addRedBorder(capacityField);
+    capacityField.setCustomValidity(roomsCapacityMap[roomsCount].errorText);
+    return false;
   } else {
-    if (capacityField.value !== '0') {
-      addRedBorder(capacityField);
-      capacityField.setCustomValidity('В 100 комнат нельзя селить гостей. Измените значение поля на "не для гостей"');
-    } else {
-      removeBorder(capacityField);
-      capacityField.setCustomValidity('');
-    }
+    removeBorder(capacityField);
+    capacityField.setCustomValidity('');
+    return true;
   }
 };
+
+// Проверяет какая кнопка мыши нажата и запускает функцию активации карты
+
+var onPinMousedown = function (evt) {
+  if (evt.button === 0) {
+    setActiveMode();
+  }
+};
+
+// Проверяет какая клавиша нажата и запускает функцию активации карты
+
+var onPinKeydown = function (evt) {
+  if (evt.key === 'Enter') {
+    setActiveMode();
+  }
+};
+
+// Проверяет данные перед отправкой
+
+var onAdFormSubmit = function (evt) {
+  evt.preventDefault();
+  if (onRoomsAndCapacityChange()) {
+    adForm.submit();
+  }
+};
+
 
 // Переводит страницу в активный режим
 
@@ -422,9 +444,14 @@ var setActiveMode = function () {
   makeItemsEnabled(adFormFieldsets);
   makeItemsEnabled(filterSelects);
   makeItemsEnabled(filterFieldsets);
+  setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT_ACTIVE);
 
-  roomNumberField.addEventListener('change', onRoomNumberFieldChange);
-  capacityField.addEventListener('change', onRoomNumberFieldChange);
+  mainPin.removeEventListener('mousedown', onPinMousedown);
+  mainPin.removeEventListener('keydown', onPinKeydown);
+
+  adForm.addEventListener('submit', onAdFormSubmit);
+  roomNumberField.addEventListener('change', onRoomsAndCapacityChange);
+  capacityField.addEventListener('change', onRoomsAndCapacityChange);
 };
 
 // Переводит страницу в неактивный режим
@@ -437,23 +464,14 @@ var setInactiveMode = function () {
   makeItemsDisabled(filterSelects);
   makeItemsDisabled(filterFieldsets);
 
-  roomNumberField.removeEventListener('change', onRoomNumberFieldChange);
-  capacityField.removeEventListener('change', onRoomNumberFieldChange);
+  mainPin.addEventListener('mousedown', onPinMousedown);
+  mainPin.addEventListener('keydown', onPinKeydown);
+
+  adForm.removeEventListener('submit', onAdFormSubmit);
+  roomNumberField.removeEventListener('change', onRoomsAndCapacityChange);
+  capacityField.removeEventListener('change', onRoomsAndCapacityChange);
 };
 
 var ads = generateAdvertisementObjects(NUMBER_OF_ADVERTISEMENT);
-
-mainPin.addEventListener('mousedown', function (evt) {
-  if (evt.button === 0) {
-    setActiveMode();
-    setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT_ACTIVE);
-  }
-});
-
-mainPin.addEventListener('keydown', function (evt) {
-  if (evt.key === 'Enter') {
-    setActiveMode();
-  }
-});
 
 setInactiveMode();
