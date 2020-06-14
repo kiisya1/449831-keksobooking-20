@@ -473,43 +473,45 @@ var onTimeOutChange = function (evt) {
 
 // Проверяет соответсвие значений в поле тип жилья и стоимость за ночь
 
-var onTypeAndPriceChange = function () {
-  var typePriceMap = {
-    'bungalo': {
-      minValue: 0,
-      errorText: ''
-    },
-    'flat': {
-      minValue: 1000,
-      errorText: 'Стоимость жилья типа "Квартира" не может быть меньше 1 000 руб. за ночь'
-    },
-    'house': {
-      minValue: 5000,
-      errorText: 'Стоимость жилья типа "Дом" не может быть меньше 5 000 руб. за ночь'
-    },
-    'palace': {
-      minValue: 10000,
-      errorText: 'Стоимость жилья типа "Дворец" не может быть меньше 10 000 руб. за ночь'
-    }
-  };
-  var type = typeField.value;
-  var price = priceField.value;
-  var message;
-  priceField.placeholder = typePriceMap[type].minValue;
-  priceField.reportValidity();
-
-  if (!price) {
-    message = 'Поле "Цена за ночь" не может быть пустым';
-    setInvalidMode(priceField, message);
-  } else if (typePriceMap[type].minValue > price) {
-    setInvalidMode(priceField, typePriceMap[type].errorText);
-    priceField.reportValidity();
-  } else if (typePriceMap[type].minValue < price < priceField.max) {
-    setValidMode(priceField);
-  } else if (price > priceField.max) {
-    message = 'Стоимость жилья за ночь не должна превышат 1 000 000 руб.';
-    setInvalidMode(priceField, message);
+var typePriceMap = {
+  'bungalo': {
+    minValue: 0,
+    errorText: ''
+  },
+  'flat': {
+    minValue: 1000,
+    errorText: 'Стоимость жилья типа "Квартира" не может быть меньше 1 000 руб. за ночь'
+  },
+  'house': {
+    minValue: 5000,
+    errorText: 'Стоимость жилья типа "Дом" не может быть меньше 5 000 руб. за ночь'
+  },
+  'palace': {
+    minValue: 10000,
+    errorText: 'Стоимость жилья типа "Дворец" не может быть меньше 10 000 руб. за ночь'
   }
+};
+
+var onTypeChange = function () {
+  var type = typeField.value;
+  priceField.placeholder = typePriceMap[type].minValue;
+  priceField.min = typePriceMap[type].minValue;
+};
+
+var onPriceInput = function (evt) {
+  onTypeChange();
+
+  var type = typeField.value;
+  if (evt.target.validity.rangeUnderflow) {
+    setInvalidMode(priceField, typePriceMap[type].errorText);
+  } else if (evt.target.validity.rangeOverflow) {
+    setInvalidMode(priceField, 'Стоимость жилья за ночь не должна превышат 1 000 000 руб.');
+  } else if (evt.target.validity.valueMissing) {
+    setInvalidMode(priceField, 'Поле "Цена за ночь" не может быть пустым');
+  } else {
+    setValidMode(priceField);
+  }
+  priceField.reportValidity();
 };
 
 // Проверяет соответсвие значения в поле выбора количества гостей значению количества комнат
@@ -589,8 +591,8 @@ var setActiveMode = function () {
   roomNumberField.addEventListener('change', onRoomsAndCapacityChange);
   capacityField.addEventListener('change', onRoomsAndCapacityChange);
   titleField.addEventListener('input', onTitleInput);
-  typeField.addEventListener('change', onTypeAndPriceChange);
-  priceField.addEventListener('input', onTypeAndPriceChange);
+  typeField.addEventListener('change', onTypeChange);
+  priceField.addEventListener('input', onPriceInput);
   timeIn.addEventListener('change', onTimeInChange);
   timeOut.addEventListener('change', onTimeOutChange);
 };
@@ -612,8 +614,8 @@ var setInactiveMode = function () {
   roomNumberField.removeEventListener('change', onRoomsAndCapacityChange);
   capacityField.removeEventListener('change', onRoomsAndCapacityChange);
   titleField.removeEventListener('input', onTitleInput);
-  typeField.removeEventListener('change', onTypeAndPriceChange);
-  priceField.removeEventListener('input', onTypeAndPriceChange);
+  typeField.removeEventListener('change', onTypeChange);
+  priceField.removeEventListener('input', onPriceInput);
   timeIn.removeEventListener('change', onTimeInChange);
   timeOut.removeEventListener('change', onTimeOutChange);
 };
