@@ -3,6 +3,9 @@
 (function () {
   var map = document.querySelector('.map');
 
+  var getAdCard = window.card.get;
+  var getPin = window.pin.get;
+
   // Добавляем обработчик собития на пин
 
   var addPinClickHandler = function (pinElement, ad) {
@@ -25,7 +28,7 @@
     var mapFiltersContainer = map.querySelector('.map__filters-container');
     var existingAdCard = map.querySelector('.map__card');
     removeAd(existingAdCard);
-    map.insertBefore(window.card.get(ad), mapFiltersContainer);
+    map.insertBefore(getAdCard(ad), mapFiltersContainer);
   };
 
   // Добавляет метки на карту
@@ -35,7 +38,7 @@
     var fragment = document.createDocumentFragment();
 
     ads.forEach(function (ad) {
-      var pinElement = window.pin.get(ad);
+      var pinElement = getPin(ad);
       addPinClickHandler(pinElement, ad);
       fragment.appendChild(pinElement);
     });
