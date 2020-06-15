@@ -44,37 +44,39 @@
 
   // Генерирует массив объектов из случайных значений
 
-  window.data = {
-    generateAdvertisementObjects: function (number) {
-      var ads = [];
-      for (var i = 0; i < number; i++) {
-        var locationX = generateRandomNumber(LOCATION_X_MIN, locationXMax);
-        var locationY = generateRandomNumber(LOCATION_Y_MIN, LOCATION_Y_MAX);
-        var ad = {
-          author: {
-            avatar: 'img/avatars/user0' + (i + 1) + '.png'
-          },
-          offer: {
-            title: 'Заголовок предложения',
-            address: locationX + ', ' + locationY,
-            price: generateRandomNumber(0, 1000000),
-            type: getRandomElement(TYPES),
-            rooms: generateRandomNumber(1, 100),
-            guests: generateRandomNumber(1, 300),
-            checkin: getRandomElement(CHECKIN_TIMES),
-            checkout: getRandomElement(CHECKOUT_TIMES),
-            features: getRandomArray(FEATURES),
-            description: 'Описание предложения в двух словах',
-            photos: getRandomArray(PHOTOS)
-          },
-          location: {
-            x: locationX,
-            y: locationY
-          }
-        };
-        ads.push(ad);
-      }
-      return ads;
+  var generateAdvertisementObjects = function (number) {
+    var ads = [];
+    for (var i = 0; i < number; i++) {
+      var locationX = generateRandomNumber(LOCATION_X_MIN, locationXMax);
+      var locationY = generateRandomNumber(LOCATION_Y_MIN, LOCATION_Y_MAX);
+      var ad = {
+        author: {
+          avatar: 'img/avatars/user0' + (i + 1) + '.png'
+        },
+        offer: {
+          title: 'Заголовок предложения',
+          address: locationX + ', ' + locationY,
+          price: generateRandomNumber(0, 1000000),
+          type: getRandomElement(TYPES),
+          rooms: generateRandomNumber(1, 100),
+          guests: generateRandomNumber(1, 300),
+          checkin: getRandomElement(CHECKIN_TIMES),
+          checkout: getRandomElement(CHECKOUT_TIMES),
+          features: getRandomArray(FEATURES),
+          description: 'Описание предложения в двух словах',
+          photos: getRandomArray(PHOTOS)
+        },
+        location: {
+          x: locationX,
+          y: locationY
+        }
+      };
+      ads.push(ad);
     }
+    return ads;
+  };
+
+  window.data = {
+    generate: generateAdvertisementObjects
   };
 })();

@@ -6,20 +6,22 @@
 
   // Генерирует метки карты
 
+  var getPinElement = function (ad) {
+    var pinTemplate = document.querySelector('#pin')
+        .content
+        .querySelector('.map__pin');
+    var pinElement = pinTemplate.cloneNode(true);
+    var pinElementImg = pinElement.querySelector('img');
+
+    pinElement.style.left = (ad.location.x - PIN_WIDTH / 2) + 'px';
+    pinElement.style.top = (ad.location.y - PIN_HEIGHT) + 'px';
+    pinElementImg.src = ad.author.avatar;
+    pinElementImg.alt = ad.offer.title;
+
+    return pinElement;
+  };
+
   window.pin = {
-    getPinElement: function (ad) {
-      var pinTemplate = document.querySelector('#pin')
-          .content
-          .querySelector('.map__pin');
-      var pinElement = pinTemplate.cloneNode(true);
-      var pinElementImg = pinElement.querySelector('img');
-
-      pinElement.style.left = (ad.location.x - PIN_WIDTH / 2) + 'px';
-      pinElement.style.top = (ad.location.y - PIN_HEIGHT) + 'px';
-      pinElementImg.src = ad.author.avatar;
-      pinElementImg.alt = ad.offer.title;
-
-      return pinElement;
-    }
+    get: getPinElement
   };
 })();

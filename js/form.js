@@ -19,11 +19,6 @@
   var roomNumberField = adForm.querySelector('#room_number');
   var capacityField = adForm.querySelector('#capacity');
 
-
-  var filterForm = document.querySelector('.map__filters');
-  var filterSelects = filterForm.querySelectorAll('select');
-  var filterFieldsets = filterForm.querySelectorAll('fieldset');
-
   // Убирает у каждого элемента массива атрибут disabled
 
   var makeItemsEnabled = function (items) {
@@ -194,56 +189,53 @@
     }
   };
 
+  // Переводит форму в активное состояние
+
+  var makeAdFormActive = function () {
+    adForm.classList.remove('ad-form--disabled');
+    makeItemsEnabled(adFormFieldsets);
+
+    adForm.addEventListener('submit', onAdFormSubmit);
+    roomNumberField.addEventListener('change', onRoomsAndCapacityChange);
+    capacityField.addEventListener('change', onRoomsAndCapacityChange);
+    titleField.addEventListener('input', onTitleInput);
+    typeField.addEventListener('change', onTypeChange);
+    priceField.addEventListener('input', onPriceInput);
+    timeIn.addEventListener('change', onTimeInChange);
+    timeOut.addEventListener('change', onTimeOutChange);
+  };
+
+  // Переводит форму в неактивное состояние
+
+  var makeAdFormInactive = function () {
+    adForm.classList.add('ad-form--disabled');
+    makeItemsDisabled(adFormFieldsets);
+
+    adForm.removeEventListener('submit', onAdFormSubmit);
+    roomNumberField.removeEventListener('change', onRoomsAndCapacityChange);
+    capacityField.removeEventListener('change', onRoomsAndCapacityChange);
+    titleField.removeEventListener('input', onTitleInput);
+    typeField.removeEventListener('change', onTypeChange);
+    priceField.removeEventListener('input', onPriceInput);
+    timeIn.removeEventListener('change', onTimeInChange);
+    timeOut.removeEventListener('change', onTimeOutChange);
+  };
+
+  // Добавляет адрес в поле адреса в соответствии с положением метки
+
+  var setPinAddress = function (pinWidth, pinHeight) {
+    var left = mainPin.style.left;
+    var top = mainPin.style.top;
+    addressField.readOnly = true;
+    addressField.value = Math.round(+left.slice(0, left.length - 2) + pinWidth / 2) + ', ' + Math.round(+top.slice(0, top.length - 2) + pinHeight);
+  };
+
   window.form = {
-    // Переводит форму в активное состояние
-    makeAdFormActive: function () {
-      adForm.classList.remove('ad-form--disabled');
-      makeItemsEnabled(adFormFieldsets);
-
-      adForm.addEventListener('submit', onAdFormSubmit);
-      roomNumberField.addEventListener('change', onRoomsAndCapacityChange);
-      capacityField.addEventListener('change', onRoomsAndCapacityChange);
-      titleField.addEventListener('input', onTitleInput);
-      typeField.addEventListener('change', onTypeChange);
-      priceField.addEventListener('input', onPriceInput);
-      timeIn.addEventListener('change', onTimeInChange);
-      timeOut.addEventListener('change', onTimeOutChange);
-    },
-
-    // Переводит форму в неактивное состояние
-    makeAdFormInactive: function () {
-      adForm.classList.add('ad-form--disabled');
-      makeItemsDisabled(adFormFieldsets);
-
-      adForm.removeEventListener('submit', onAdFormSubmit);
-      roomNumberField.removeEventListener('change', onRoomsAndCapacityChange);
-      capacityField.removeEventListener('change', onRoomsAndCapacityChange);
-      titleField.removeEventListener('input', onTitleInput);
-      typeField.removeEventListener('change', onTypeChange);
-      priceField.removeEventListener('input', onPriceInput);
-      timeIn.removeEventListener('change', onTimeInChange);
-      timeOut.removeEventListener('change', onTimeOutChange);
-    },
-
-    // Переводит фильтр в активное состояние
-    makeFilterFormActive: function () {
-      makeItemsEnabled(filterSelects);
-      makeItemsEnabled(filterFieldsets);
-    },
-
-    // Переводит форму фильтра в неактивное состояние
-    makeFilterFormInactive: function () {
-      makeItemsDisabled(filterSelects);
-      makeItemsDisabled(filterFieldsets);
-    },
-
-    // Добавляет адрес в поле адреса в соответствии с положением метки
-    setPinAddress: function (pinWidth, pinHeight) {
-      var left = mainPin.style.left;
-      var top = mainPin.style.top;
-      addressField.readOnly = true;
-      addressField.value = Math.round(+left.slice(0, left.length - 2) + pinWidth / 2) + ', ' + Math.round(+top.slice(0, top.length - 2) + pinHeight);
-    }
+    activate: makeAdFormActive,
+    deactivate: makeAdFormInactive,
+    setPinAddress: setPinAddress,
+    disableItems: makeItemsDisabled,
+    enableItems: makeItemsEnabled
   };
 
 })();

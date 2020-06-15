@@ -9,6 +9,19 @@
   var map = document.querySelector('.map');
   var mainPin = map.querySelector('.map__pin--main');
 
+  var generateAdsObjects = window.data.generate;
+
+  var makeMapActive = window.mapMethods.activate;
+  var makeMapInactive = window.mapMethods.deactivate;
+  var renderPins = window.mapMethods.renderPins;
+
+  var makeAdFormActive = window.form.activate;
+  var makeAdFormInactive = window.form.deactivate;
+  var setPinAddress = window.form.setPinAddress;
+
+  var makeFilterActive = window.filter.activate;
+  var makeFilterInactive = window.filter.deactivate;
+
   // Проверяет какая кнопка мыши нажата и запускает функцию активации страницы
 
   var onPinMousedown = function (evt) {
@@ -28,12 +41,12 @@
   // Переводит страницу в активный режим
 
   var setActiveMode = function () {
-    window.mapMethods.makeMapActive();
-    window.form.makeAdFormActive();
-    window.form.makeFilterFormActive();
-    window.mapMethods.renderPins(ads);
+    makeMapActive();
+    makeAdFormActive();
+    makeFilterActive();
+    renderPins(ads);
 
-    window.form.setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT_ACTIVE);
+    setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT_ACTIVE);
     mainPin.removeEventListener('mousedown', onPinMousedown);
     mainPin.removeEventListener('keydown', onPinKeydown);
   };
@@ -41,15 +54,15 @@
   // Переводит страницу в неактивный режим
 
   var setInactiveMode = function () {
-    window.mapMethods.makeMapInactive();
-    window.form.makeAdFormInactive();
-    window.form.makeFilterFormInactive();
+    makeMapInactive();
+    makeAdFormInactive();
+    makeFilterInactive();
 
-    window.form.setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT / 2);
+    setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT / 2);
     mainPin.addEventListener('mousedown', onPinMousedown);
     mainPin.addEventListener('keydown', onPinKeydown);
   };
 
-  var ads = window.data.generateAdvertisementObjects(NUMBER_OF_ADVERTISEMENT);
+  var ads = generateAdsObjects(NUMBER_OF_ADVERTISEMENT);
   setInactiveMode();
 })();

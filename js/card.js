@@ -158,43 +158,44 @@
   };
 
   // Создает карточку объявления
+  var getAdCard = function (ad) {
+    var adTemplate = document.querySelector('#card')
+        .content
+        .querySelector('.map__card');
+    var adElement = adTemplate.cloneNode(true);
+    var adTitle = adElement.querySelector('.popup__title');
+    var adAddress = adElement.querySelector('.popup__text--address');
+    var adPrice = adElement.querySelector('.popup__text--price');
+    var adType = adElement.querySelector('.popup__type');
+    var adCapacity = adElement.querySelector('.popup__text--capacity');
+    var adTiming = adElement.querySelector('.popup__text--time');
+    var adFeatures = adElement.querySelector('.popup__features');
+    var adDescription = adElement.querySelector('.popup__description');
+    var adPhotos = adElement.querySelector('.popup__photos');
+    var adAvatar = adElement.querySelector('.popup__avatar');
+    var adClose = adElement.querySelector('.popup__close');
+
+    addNotEmptyContent(adTitle, addTextToElement, ad.offer.title);
+    addNotEmptyContent(adAddress, addTextToElement, ad.offer.address);
+    addNotEmptyContent(adPrice, addPriceToAd, ad.offer.price);
+    addNotEmptyContent(adType, addTypeToAd, ad.offer.type);
+    addNotEmptyContent(adCapacity, addCapacityToAd, ad.offer.rooms, ad.offer.guests);
+    addNotEmptyContent(adTiming, addTimesToAd, ad.offer.checkin, ad.offer.checkout);
+    addNotEmptyContent(adDescription, addTextToElement, ad.offer.description);
+    addNotEmptyContent(adAvatar, addAvatarToAd, ad.author.avatar);
+    addNotEmptyContent(adFeatures, addFeaturesToAd, ad.offer.features);
+    addNotEmptyContent(adPhotos, addPhotosToAd, ad.offer.photos);
+
+    adClose.addEventListener('click', function () {
+      adElement.remove();
+    });
+
+    document.addEventListener('keydown', onAdEscape);
+
+    return adElement;
+  };
 
   window.card = {
-    getAdCard: function (ad) {
-      var adTemplate = document.querySelector('#card')
-          .content
-          .querySelector('.map__card');
-      var adElement = adTemplate.cloneNode(true);
-      var adTitle = adElement.querySelector('.popup__title');
-      var adAddress = adElement.querySelector('.popup__text--address');
-      var adPrice = adElement.querySelector('.popup__text--price');
-      var adType = adElement.querySelector('.popup__type');
-      var adCapacity = adElement.querySelector('.popup__text--capacity');
-      var adTiming = adElement.querySelector('.popup__text--time');
-      var adFeatures = adElement.querySelector('.popup__features');
-      var adDescription = adElement.querySelector('.popup__description');
-      var adPhotos = adElement.querySelector('.popup__photos');
-      var adAvatar = adElement.querySelector('.popup__avatar');
-      var adClose = adElement.querySelector('.popup__close');
-
-      addNotEmptyContent(adTitle, addTextToElement, ad.offer.title);
-      addNotEmptyContent(adAddress, addTextToElement, ad.offer.address);
-      addNotEmptyContent(adPrice, addPriceToAd, ad.offer.price);
-      addNotEmptyContent(adType, addTypeToAd, ad.offer.type);
-      addNotEmptyContent(adCapacity, addCapacityToAd, ad.offer.rooms, ad.offer.guests);
-      addNotEmptyContent(adTiming, addTimesToAd, ad.offer.checkin, ad.offer.checkout);
-      addNotEmptyContent(adDescription, addTextToElement, ad.offer.description);
-      addNotEmptyContent(adAvatar, addAvatarToAd, ad.author.avatar);
-      addNotEmptyContent(adFeatures, addFeaturesToAd, ad.offer.features);
-      addNotEmptyContent(adPhotos, addPhotosToAd, ad.offer.photos);
-
-      adClose.addEventListener('click', function () {
-        adElement.remove();
-      });
-
-      document.addEventListener('keydown', onAdEscape);
-
-      return adElement;
-    }
+    get: getAdCard
   };
 })();

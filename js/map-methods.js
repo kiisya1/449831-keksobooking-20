@@ -25,34 +25,40 @@
     var mapFiltersContainer = map.querySelector('.map__filters-container');
     var existingAdCard = map.querySelector('.map__card');
     removeAd(existingAdCard);
-    map.insertBefore(window.card.getAdCard(ad), mapFiltersContainer);
+    map.insertBefore(window.card.get(ad), mapFiltersContainer);
+  };
+
+  // Добавляет метки на карту
+
+  var renderPins = function (ads) {
+    var pinsBlock = map.querySelector('.map__pins');
+    var fragment = document.createDocumentFragment();
+
+    ads.forEach(function (ad) {
+      var pinElement = window.pin.get(ad);
+      addPinClickHandler(pinElement, ad);
+      fragment.appendChild(pinElement);
+    });
+
+    pinsBlock.appendChild(fragment);
+  };
+
+  // Переводит карту в активное состояние
+
+  var makeMapActive = function () {
+    map.classList.remove('map--faded');
+  };
+
+  // Переводит карту в неактивное состояние
+
+  var makeMapInactive = function () {
+    map.classList.add('map--faded');
   };
 
   window.mapMethods = {
-
-    // Добавляет метки на карту
-    renderPins: function (ads) {
-      var pinsBlock = map.querySelector('.map__pins');
-      var fragment = document.createDocumentFragment();
-
-      ads.forEach(function (ad) {
-        var pinElement = window.pin.getPinElement(ad);
-        addPinClickHandler(pinElement, ad);
-        fragment.appendChild(pinElement);
-      });
-
-      pinsBlock.appendChild(fragment);
-    },
-
-    // Переводит карту в активное состояние
-    makeMapActive: function () {
-      map.classList.remove('map--faded');
-    },
-
-    // Переводит карту в неактивное состояние
-    makeMapInactive: function () {
-      map.classList.add('map--faded');
-    },
+    renderPins: renderPins,
+    activate: makeMapActive,
+    deactivate: makeMapInactive
   };
 
 })();
