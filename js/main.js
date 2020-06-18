@@ -22,6 +22,8 @@
   var makeFilterActive = window.filter.activate;
   var makeFilterInactive = window.filter.deactivate;
 
+  var onMainPinMousedown = window.mainPin.mousedown;
+
   // Проверяет какая кнопка мыши нажата и запускает функцию активации страницы
 
   var onPinMousedown = function (evt) {
@@ -49,6 +51,8 @@
     setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT_ACTIVE);
     mainPin.removeEventListener('mousedown', onPinMousedown);
     mainPin.removeEventListener('keydown', onPinKeydown);
+
+    mainPin.addEventListener('mousedown', onMainPinMousedown);
   };
 
   // Переводит страницу в неактивный режим
@@ -59,6 +63,8 @@
     makeFilterInactive();
 
     setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT / 2);
+    mainPin.removeEventListener('mousedown', onMainPinMousedown);
+
     mainPin.addEventListener('mousedown', onPinMousedown);
     mainPin.addEventListener('keydown', onPinKeydown);
   };

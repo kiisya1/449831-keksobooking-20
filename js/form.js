@@ -224,10 +224,10 @@
   // Добавляет адрес в поле адреса в соответствии с положением метки
 
   var setPinAddress = function (pinWidth, pinHeight) {
-    var left = mainPin.style.left;
-    var top = mainPin.style.top;
+    var left = mainPin.offsetLeft;
+    var top = mainPin.offsetTop;
     addressField.readOnly = true;
-    addressField.value = Math.round(+left.slice(0, left.length - 2) + pinWidth / 2) + ', ' + Math.round(+top.slice(0, top.length - 2) + pinHeight);
+    addressField.value = Math.floor(left + pinWidth / 2) + ', ' + Math.floor(top + pinHeight);
   };
 
   window.form = {
