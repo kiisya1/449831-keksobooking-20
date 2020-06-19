@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var NUMBER_OF_ADVERTISEMENT = 5;
+
   var map = document.querySelector('.map');
 
   var getAdCard = window.card.get;
@@ -10,6 +12,11 @@
 
   var addPinClickHandler = function (pinElement, ad) {
     pinElement.addEventListener('click', function () {
+      var activePin = map.querySelector('.map__pin--active');
+      if (activePin) {
+        activePin.classList.remove('map__pin--active');
+      }
+      pinElement.classList.add('map__pin--active');
       renderAd(ad);
     });
   };
@@ -36,12 +43,18 @@
   var renderPins = function (ads) {
     var pinsBlock = map.querySelector('.map__pins');
     var fragment = document.createDocumentFragment();
-
-    ads.forEach(function (ad) {
-      var pinElement = getPin(ad);
-      addPinClickHandler(pinElement, ad);
-      fragment.appendChild(pinElement);
-    });
+    var count = 0;
+    for (var i = 0; i < ads.length; i++) {
+      if (ads[i].offer) {
+        var pinElement = getPin(ads[i]);
+        addPinClickHandler(pinElement, ads[i]);
+        fragment.appendChild(pinElement);
+        ++count;
+        if (count >= NUMBER_OF_ADVERTISEMENT) {
+          break;
+        }
+      }
+    }
 
     pinsBlock.appendChild(fragment);
   };

@@ -1,7 +1,6 @@
 'use strict';
 
 (function () {
-  var NUMBER_OF_ADVERTISEMENT = 8;
   var MAIN_PIN_WIDTH = 65;
   var MAIN_PIN_HEIGHT = 65;
   var MAIN_PIN_HEIGHT_ACTIVE = 84;
@@ -9,7 +8,7 @@
   var map = document.querySelector('.map');
   var mainPin = map.querySelector('.map__pin--main');
 
-  var generateAdsObjects = window.data.generate;
+  // var generateAdsObjects = window.data.generate;
 
   var makeMapActive = window.mapMethods.activate;
   var makeMapInactive = window.mapMethods.deactivate;
@@ -23,6 +22,8 @@
   var makeFilterInactive = window.filter.deactivate;
 
   var onMainPinMousedown = window.mainPin.mousedown;
+
+  var loadAds = window.backend.load;
 
   // Проверяет какая кнопка мыши нажата и запускает функцию активации страницы
 
@@ -46,9 +47,9 @@
     makeMapActive();
     makeAdFormActive();
     makeFilterActive();
-    renderPins(ads);
 
     setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT_ACTIVE);
+    loadAds(renderPins, alert);
     mainPin.removeEventListener('mousedown', onPinMousedown);
     mainPin.removeEventListener('keydown', onPinKeydown);
 
@@ -69,6 +70,6 @@
     mainPin.addEventListener('keydown', onPinKeydown);
   };
 
-  var ads = generateAdsObjects(NUMBER_OF_ADVERTISEMENT);
+  // var ads = generateAdsObjects(NUMBER_OF_ADVERTISEMENT);
   setInactiveMode();
 })();
