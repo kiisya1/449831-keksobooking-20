@@ -8,8 +8,6 @@
   var map = document.querySelector('.map');
   var mainPin = map.querySelector('.map__pin--main');
 
-  // var generateAdsObjects = window.data.generate;
-
   var makeMapActive = window.mapMethods.activate;
   var makeMapInactive = window.mapMethods.deactivate;
   var renderPins = window.mapMethods.renderPins;
@@ -41,6 +39,12 @@
     }
   };
 
+  // Рендерит объявления, если загрузка была успешной
+
+  var onLoadAdsSuccess = function (ads) {
+    renderPins(ads);
+  };
+
   // Переводит страницу в активный режим
 
   var setActiveMode = function () {
@@ -49,7 +53,7 @@
     makeFilterActive();
 
     setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT_ACTIVE);
-    loadAds(renderPins, alert);
+    loadAds(onLoadAdsSuccess, alert);
     mainPin.removeEventListener('mousedown', onPinMousedown);
     mainPin.removeEventListener('keydown', onPinKeydown);
 
@@ -70,6 +74,5 @@
     mainPin.addEventListener('keydown', onPinKeydown);
   };
 
-  // var ads = generateAdsObjects(NUMBER_OF_ADVERTISEMENT);
   setInactiveMode();
 })();
