@@ -23,6 +23,8 @@
 
   var loadAds = window.backend.load;
 
+  var addErrorMessage = window.error.add;
+
   // Проверяет какая кнопка мыши нажата и запускает функцию активации страницы
 
   var onPinMousedown = function (evt) {
@@ -45,6 +47,13 @@
     renderPins(ads);
   };
 
+  // Показывает ошибку, если что-то пошло не так
+
+  var onLoadAdsError = function (errorMessage) {
+    var message = 'Ошибка загрузки объявлений: ' + errorMessage;
+    addErrorMessage(message);
+  };
+
   // Переводит страницу в активный режим
 
   var setActiveMode = function () {
@@ -53,7 +62,7 @@
     makeFilterActive();
 
     setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT_ACTIVE);
-    loadAds(onLoadAdsSuccess, alert);
+    loadAds(onLoadAdsSuccess, onLoadAdsError);
     mainPin.removeEventListener('mousedown', onPinMousedown);
     mainPin.removeEventListener('keydown', onPinKeydown);
 

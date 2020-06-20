@@ -8,6 +8,8 @@
   var getAdCard = window.card.get;
   var getPin = window.pin.get;
 
+  var shuffleArray = window.util.shuffleArray;
+
   // Добавляем обработчик собития на пин
 
   var addPinClickHandler = function (pinElement, ad) {
@@ -38,23 +40,33 @@
     map.insertBefore(getAdCard(ad), mapFiltersContainer);
   };
 
+  // Проверяет есть ли у объектов массива объявлений свойство offer
+
+  var checkAds = function (ads) {
+    var checkedAds = [];
+    for (var i = 0; i < ads.length; i++) {
+      if (ads[i].offer) {
+        checkedAds.push(ads[i]);
+      }
+    }
+    return checkedAds;
+  };
+
   // Добавляет метки на карту
 
   var renderPins = function (ads) {
     var pinsBlock = map.querySelector('.map__pins');
     var fragment = document.createDocumentFragment();
-    var count = 0;
-    for (var i = 0; i < ads.length; i++) {
-      if (ads[i].offer) {
-        var pinElement = getPin(ads[i]);
-        addPinClickHandler(pinElement, ads[i]);
-        fragment.appendChild(pinElement);
-        ++count;
-        if (count >= NUMBER_OF_ADVERTISEMENT) {
-          break;
-        }
-      }
-    }
+
+    var checkedAds = checkAds(ads);
+    var shuffledAds = shuffleArray(checkedAds);
+    shuffledAds = shuffledAds.slice(0, NUMBER_OF_ADVERTISEMENT);
+
+    shuffledAds.forEach(function (ad) {
+      var pinElement = getPin(ad);
+      addPinClickHandler(pinElement, ad);
+      fragment.appendChild(pinElement);
+    });
 
     pinsBlock.appendChild(fragment);
   };

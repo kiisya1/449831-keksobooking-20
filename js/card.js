@@ -158,6 +158,7 @@
   };
 
   // Создает карточку объявления
+
   var getAdCard = function (ad) {
     var adTemplate = document.querySelector('#card')
         .content
