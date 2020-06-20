@@ -1,15 +1,12 @@
 'use strict';
 
 (function () {
-  var NUMBER_OF_ADVERTISEMENT = 8;
   var MAIN_PIN_WIDTH = 65;
   var MAIN_PIN_HEIGHT = 65;
   var MAIN_PIN_HEIGHT_ACTIVE = 84;
 
   var map = document.querySelector('.map');
   var mainPin = map.querySelector('.map__pin--main');
-
-  var generateAdsObjects = window.data.generate;
 
   var makeMapActive = window.mapMethods.activate;
   var makeMapInactive = window.mapMethods.deactivate;
@@ -23,6 +20,10 @@
   var makeFilterInactive = window.filter.deactivate;
 
   var onMainPinMousedown = window.mainPin.mousedown;
+
+  var loadAds = window.backend.load;
+
+  var addErrorMessage = window.error.add;
 
   // Проверяет какая кнопка мыши нажата и запускает функцию активации страницы
 
@@ -40,15 +41,28 @@
     }
   };
 
+  // Рендерит объявления, если загрузка была успешной
+
+  var onLoadAdsSuccess = function (ads) {
+    renderPins(ads);
+  };
+
+  // Показывает ошибку, если что-то пошло не так
+
+  var onLoadAdsError = function (errorMessage) {
+    var message = 'Ошибка загрузки объявлений: ' + errorMessage;
+    addErrorMessage(message);
+  };
+
   // Переводит страницу в активный режим
 
   var setActiveMode = function () {
     makeMapActive();
     makeAdFormActive();
     makeFilterActive();
-    renderPins(ads);
 
     setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT_ACTIVE);
+    loadAds(onLoadAdsSuccess, onLoadAdsError);
     mainPin.removeEventListener('mousedown', onPinMousedown);
     mainPin.removeEventListener('keydown', onPinKeydown);
 
@@ -69,6 +83,5 @@
     mainPin.addEventListener('keydown', onPinKeydown);
   };
 
-  var ads = generateAdsObjects(NUMBER_OF_ADVERTISEMENT);
   setInactiveMode();
 })();
