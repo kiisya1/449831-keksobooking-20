@@ -13,7 +13,42 @@
   var makeRequest = function (method, url, onLoad, onError, data) {
     var xhr = new XMLHttpRequest();
 
-    onLoad(xhr);
+    xhr.addEventListener('load', function () {
+      switch (method) {
+        case 'GET':
+          var error;
+          switch (xhr.status) {
+            case StatusCode.OK:
+              try {
+                onLoad(JSON.parse(xhr.responseText));
+              } catch (err) {
+                onError('Ошибка данных: ' + err.message);
+              }
+              break;
+            case StatusCode.NOT_FOUND:
+              error = 'Ничего не найдено';
+              break;
+            case StatusCode.BAD_REQUEST:
+              error = 'Неверный запрос';
+              break;
+            default:
+              error = 'Статус ответа: ' + xhr.status + ' ' + xhr.statusText;
+          }
+
+          if (error) {
+            onError(error);
+          }
+          break;
+        default:
+          switch (xhr.status) {
+            case StatusCode.OK:
+              onLoad(JSON.parse(xhr.responseText));
+              break;
+            default:
+              onError();
+          }
+      }
+    });
 
     xhr.addEventListener('error', function () {
       onError('Произошла ошибка соединения');
@@ -33,50 +68,11 @@
   };
 
   var load = function (onLoad, onError) {
-    var onXHRLoad = function (xhr) {
-      xhr.addEventListener('load', function () {
-        var error;
-        switch (xhr.status) {
-          case StatusCode.OK:
-            try {
-              onLoad(JSON.parse(xhr.responseText));
-            } catch (err) {
-              onError('Ошибка данных: ' + err.message);
-            }
-            break;
-          case StatusCode.NOT_FOUND:
-            error = 'Ничего не найдено';
-            break;
-          case StatusCode.BAD_REQUEST:
-            error = 'Неверный запрос';
-            break;
-          default:
-            error = 'Статус ответа: ' + xhr.status + ' ' + xhr.statusText;
-        }
-
-        if (error) {
-          onError(error);
-        }
-      });
-    };
-
-    makeRequest('GET', LOAD_URL, onXHRLoad, onError);
+    makeRequest('GET', LOAD_URL, onLoad, onError);
   };
 
   var upload = function (data, onLoad, onError) {
-    var onXHRLoad = function (xhr) {
-      xhr.addEventListener('load', function () {
-        switch (xhr.status) {
-          case StatusCode.OK:
-            onLoad(JSON.parse(xhr.responseText));
-            break;
-          default:
-            onError();
-        }
-      });
-    };
-
-    makeRequest('POST', UPLOAD_URL, onXHRLoad, onError, data);
+    makeRequest('POST', UPLOAD_URL, onLoad, onError, data);
 
   };
 
