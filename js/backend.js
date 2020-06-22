@@ -2,6 +2,7 @@
 
 (function () {
   var LOAD_URL = 'https://javascript.pages.academy/keksobooking/data';
+  var UPLOAD_URL = 'https://javascript.pages.academy/keksobooking';
   var TIMEOUT_IN_MS = 10000;
   var StatusCode = {
     OK: 200,
@@ -9,38 +10,10 @@
     BAD_REQUEST: 400
   };
 
-  var load = function (onLoad, onError) {
+  var makeRequest = function (method, url, onLoad, onError, data) {
     var xhr = new XMLHttpRequest();
 
-    xhr.addEventListener('load', function () {
-      var error;
-      switch (xhr.status) {
-        case StatusCode.OK:
-        // Проверяю полностью ли пришел файл,
-        // т.к. в ТЗ указано "Данные с сервера могут быть получены не в полном объёме."
-        // Другую проверку не придумала пока
-
-          try {
-            onLoad(JSON.parse(xhr.responseText));
-          } catch (err) {
-            onError('Ошибка данных: ' + err.message);
-          }
-          break;
-        case StatusCode.NOT_FOUND:
-          error = 'Ничего не найдено';
-          break;
-        case StatusCode.BAD_REQUEST:
-          error = 'Неверный запрос';
-          break;
-        default:
-          error = 'Статус ответа: ' + xhr.status + ' ' + xhr.statusText;
-      }
-
-      if (error) {
-        onError(error);
-      }
-
-    });
+    onLoad(xhr);
 
     xhr.addEventListener('error', function () {
       onError('Произошла ошибка соединения');
@@ -51,11 +24,64 @@
     });
 
     xhr.timeout = TIMEOUT_IN_MS;
-    xhr.open('GET', LOAD_URL);
-    xhr.send();
+    xhr.open(method, url);
+    if (data) {
+      xhr.send(data);
+    } else {
+      xhr.send();
+    }
+  };
+
+  var load = function (onLoad, onError) {
+    var onXHRLoad = function (xhr) {
+      xhr.addEventListener('load', function () {
+        var error;
+        switch (xhr.status) {
+          case StatusCode.OK:
+            try {
+              onLoad(JSON.parse(xhr.responseText));
+            } catch (err) {
+              onError('Ошибка данных: ' + err.message);
+            }
+            break;
+          case StatusCode.NOT_FOUND:
+            error = 'Ничего не найдено';
+            break;
+          case StatusCode.BAD_REQUEST:
+            error = 'Неверный запрос';
+            break;
+          default:
+            error = 'Статус ответа: ' + xhr.status + ' ' + xhr.statusText;
+        }
+
+        if (error) {
+          onError(error);
+        }
+      });
+    };
+
+    makeRequest('GET', LOAD_URL, onXHRLoad, onError);
+  };
+
+  var upload = function (data, onLoad, onError) {
+    var onXHRLoad = function (xhr) {
+      xhr.addEventListener('load', function () {
+        switch (xhr.status) {
+          case StatusCode.OK:
+            onLoad(JSON.parse(xhr.responseText));
+            break;
+          default:
+            onError();
+        }
+      });
+    };
+
+    makeRequest('POST', UPLOAD_URL, onXHRLoad, onError, data);
+
   };
 
   window.backend = {
-    load: load
+    load: load,
+    upload: upload
   };
 })();

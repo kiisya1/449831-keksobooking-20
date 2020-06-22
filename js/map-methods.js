@@ -25,7 +25,8 @@
 
   // Удаляет карточку объявления, если она уже есть
 
-  var removeAd = function (adElement) {
+  var removeAd = function () {
+    var adElement = map.querySelector('.map__card');
     if (adElement) {
       adElement.remove();
     }
@@ -35,8 +36,7 @@
 
   var renderAd = function (ad) {
     var mapFiltersContainer = map.querySelector('.map__filters-container');
-    var existingAdCard = map.querySelector('.map__card');
-    removeAd(existingAdCard);
+    removeAd();
     map.insertBefore(getAdCard(ad), mapFiltersContainer);
   };
 
@@ -71,6 +71,15 @@
     pinsBlock.appendChild(fragment);
   };
 
+  // Удаляет метки с карты
+
+  var removePins = function () {
+    var pins = map.querySelectorAll('.map__pin:not(.map__pin--main)');
+    pins.forEach(function (pin) {
+      pin.remove();
+    });
+  };
+
   // Переводит карту в активное состояние
 
   var makeMapActive = function () {
@@ -81,6 +90,8 @@
 
   var makeMapInactive = function () {
     map.classList.add('map--faded');
+    removePins();
+    removeAd();
   };
 
   window.mapMethods = {

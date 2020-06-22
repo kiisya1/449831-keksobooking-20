@@ -19,6 +19,8 @@
   var roomNumberField = adForm.querySelector('#room_number');
   var capacityField = adForm.querySelector('#capacity');
 
+  var inputs = adForm.querySelectorAll('input');
+  var selects = adForm.querySelectorAll('select');
   // Убирает у каждого элемента массива атрибут disabled
 
   var makeItemsEnabled = function (items) {
@@ -32,6 +34,14 @@
   var makeItemsDisabled = function (items) {
     items.forEach(function (item) {
       item.disabled = true;
+    });
+  };
+
+  // Убирает ошибки у полей формы
+
+  var clearErrors = function (items) {
+    items.forEach(function (item) {
+      setValidMode(item);
     });
   };
 
@@ -180,22 +190,12 @@
     }
   };
 
-  // Проверяет данные перед отправкой
-
-  var onAdFormSubmit = function (evt) {
-    evt.preventDefault();
-    if (onRoomsAndCapacityChange()) {
-      adForm.submit();
-    }
-  };
-
   // Переводит форму в активное состояние
 
   var makeAdFormActive = function () {
     adForm.classList.remove('ad-form--disabled');
     makeItemsEnabled(adFormFieldsets);
 
-    adForm.addEventListener('submit', onAdFormSubmit);
     roomNumberField.addEventListener('change', onRoomsAndCapacityChange);
     capacityField.addEventListener('change', onRoomsAndCapacityChange);
     titleField.addEventListener('input', onTitleInput);
@@ -209,9 +209,11 @@
 
   var makeAdFormInactive = function () {
     adForm.classList.add('ad-form--disabled');
+    adForm.reset();
     makeItemsDisabled(adFormFieldsets);
+    clearErrors(inputs);
+    clearErrors(selects);
 
-    adForm.removeEventListener('submit', onAdFormSubmit);
     roomNumberField.removeEventListener('change', onRoomsAndCapacityChange);
     capacityField.removeEventListener('change', onRoomsAndCapacityChange);
     titleField.removeEventListener('input', onTitleInput);
@@ -231,6 +233,7 @@
   };
 
   window.form = {
+    onRoomsAndCapacityChange: onRoomsAndCapacityChange,
     activate: makeAdFormActive,
     deactivate: makeAdFormInactive,
     setPinAddress: setPinAddress,
