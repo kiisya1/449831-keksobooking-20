@@ -42,14 +42,8 @@
 
   // Проверяет есть ли у объектов массива объявлений свойство offer
 
-  var checkAds = function (ads) {
-    var checkedAds = [];
-    for (var i = 0; i < ads.length; i++) {
-      if (ads[i].offer) {
-        checkedAds.push(ads[i]);
-      }
-    }
-    return checkedAds;
+  var checkAds = function (ad) {
+    return ad.offer;
   };
 
   // Добавляет метки на карту
@@ -58,7 +52,7 @@
     var pinsBlock = map.querySelector('.map__pins');
     var fragment = document.createDocumentFragment();
 
-    var checkedAds = checkAds(ads);
+    var checkedAds = ads.filter(checkAds);
     var shuffledAds = shuffleArray(checkedAds);
     shuffledAds = shuffledAds.slice(0, NUMBER_OF_ADVERTISEMENT);
 
