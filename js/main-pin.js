@@ -9,6 +9,9 @@
   var map = document.querySelector('.map');
   var pin = map.querySelector('.map__pin--main');
 
+  var startPinOffsetX = pin.offsetLeft;
+  var startPinOffsetY = pin.offsetTop;
+
   var location = {
     map: {
       minX: 0,
@@ -16,6 +19,11 @@
       minY: 130,
       maxY: 630
     }
+  };
+
+  var setStartState = function () {
+    pin.style.left = startPinOffsetX + 'px';
+    pin.style.top = startPinOffsetY + 'px';
   };
 
   var movePin = function (evt, startCoords, pinOffset) {
@@ -81,6 +89,7 @@
   };
 
   window.mainPin = {
-    mousedown: onPinMousedown
+    mousedown: onPinMousedown,
+    setStartState: setStartState
   };
 })();

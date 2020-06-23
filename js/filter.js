@@ -18,6 +18,7 @@
   // Переводит форму фильтра в неактивное состояние
 
   var makeFilterFormInactive = function () {
+    filterForm.reset();
     disableItems(filterSelects);
     disableItems(filterFieldsets);
   };

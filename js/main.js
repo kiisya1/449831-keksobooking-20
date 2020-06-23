@@ -8,6 +8,9 @@
   var map = document.querySelector('.map');
   var mainPin = map.querySelector('.map__pin--main');
 
+  var adForm = document.querySelector('.ad-form');
+  var resetButton = adForm.querySelector('.ad-form__reset');
+
   var makeMapActive = window.mapMethods.activate;
   var makeMapInactive = window.mapMethods.deactivate;
   var renderPins = window.mapMethods.renderPins;
@@ -15,15 +18,19 @@
   var makeAdFormActive = window.form.activate;
   var makeAdFormInactive = window.form.deactivate;
   var setPinAddress = window.form.setPinAddress;
+  var onRoomsAndCapacityChange = window.form.onRoomsAndCapacityChange;
 
   var makeFilterActive = window.filter.activate;
   var makeFilterInactive = window.filter.deactivate;
 
   var onMainPinMousedown = window.mainPin.mousedown;
+  var setPinStartState = window.mainPin.setStartState;
 
   var loadAds = window.backend.load;
+  var uploadFormData = window.backend.upload;
 
-  var addErrorMessage = window.error.add;
+  var addErrorMessage = window.message.addError;
+  var addSuccessMessage = window.message.addSuccess;
 
   // Проверяет какая кнопка мыши нажата и запускает функцию активации страницы
 
@@ -54,6 +61,34 @@
     addErrorMessage(message);
   };
 
+  // Показывает ошибку, если данные формы не удалось отправить
+
+  var onUploadAdError = function (error) {
+    addErrorMessage(error);
+  };
+
+  // Показывает сообщение об успешной отправке формы и переводит страницу в неактивное состояние
+
+  var onUploadAdSuccess = function () {
+    addSuccessMessage();
+    setInactiveMode();
+  };
+
+  // Проверяет данные перед отправкой и отправляет данные формы
+
+  var onAdFormSubmit = function (evt) {
+    evt.preventDefault();
+    if (onRoomsAndCapacityChange()) {
+      uploadFormData(new FormData(adForm), onUploadAdSuccess, onUploadAdError);
+    }
+  };
+
+  // Переводит страницу в неактивное состояние по нажатию кнопки
+
+  var onResetButtonClick = function () {
+    setInactiveMode();
+  };
+
   // Переводит страницу в активный режим
 
   var setActiveMode = function () {
@@ -63,6 +98,9 @@
 
     setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT_ACTIVE);
     loadAds(onLoadAdsSuccess, onLoadAdsError);
+
+    adForm.addEventListener('submit', onAdFormSubmit);
+    resetButton.addEventListener('click', onResetButtonClick);
     mainPin.removeEventListener('mousedown', onPinMousedown);
     mainPin.removeEventListener('keydown', onPinKeydown);
 
@@ -75,9 +113,12 @@
     makeMapInactive();
     makeAdFormInactive();
     makeFilterInactive();
+    setPinStartState();
 
     setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT / 2);
     mainPin.removeEventListener('mousedown', onMainPinMousedown);
+    adForm.removeEventListener('submit', onAdFormSubmit);
+    resetButton.removeEventListener('click', onResetButtonClick);
 
     mainPin.addEventListener('mousedown', onPinMousedown);
     mainPin.addEventListener('keydown', onPinKeydown);

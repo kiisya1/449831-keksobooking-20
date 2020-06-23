@@ -25,7 +25,8 @@
 
   // Удаляет карточку объявления, если она уже есть
 
-  var removeAd = function (adElement) {
+  var removeAd = function () {
+    var adElement = map.querySelector('.map__card');
     if (adElement) {
       adElement.remove();
     }
@@ -35,21 +36,14 @@
 
   var renderAd = function (ad) {
     var mapFiltersContainer = map.querySelector('.map__filters-container');
-    var existingAdCard = map.querySelector('.map__card');
-    removeAd(existingAdCard);
+    removeAd();
     map.insertBefore(getAdCard(ad), mapFiltersContainer);
   };
 
   // Проверяет есть ли у объектов массива объявлений свойство offer
 
-  var checkAds = function (ads) {
-    var checkedAds = [];
-    for (var i = 0; i < ads.length; i++) {
-      if (ads[i].offer) {
-        checkedAds.push(ads[i]);
-      }
-    }
-    return checkedAds;
+  var checkAds = function (ad) {
+    return ad.offer;
   };
 
   // Добавляет метки на карту
@@ -58,7 +52,7 @@
     var pinsBlock = map.querySelector('.map__pins');
     var fragment = document.createDocumentFragment();
 
-    var checkedAds = checkAds(ads);
+    var checkedAds = ads.filter(checkAds);
     var shuffledAds = shuffleArray(checkedAds);
     shuffledAds = shuffledAds.slice(0, NUMBER_OF_ADVERTISEMENT);
 
@@ -71,6 +65,15 @@
     pinsBlock.appendChild(fragment);
   };
 
+  // Удаляет метки с карты
+
+  var removePins = function () {
+    var pins = map.querySelectorAll('.map__pin:not(.map__pin--main)');
+    pins.forEach(function (pin) {
+      pin.remove();
+    });
+  };
+
   // Переводит карту в активное состояние
 
   var makeMapActive = function () {
@@ -81,6 +84,8 @@
 
   var makeMapInactive = function () {
     map.classList.add('map--faded');
+    removePins();
+    removeAd();
   };
 
   window.mapMethods = {
