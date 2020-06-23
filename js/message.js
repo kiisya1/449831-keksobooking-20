@@ -27,7 +27,7 @@
     removeMessage();
   };
 
-  var getMessage = function (type, message) {
+  var getMessage = function (type) {
     var messageTemplate = document.querySelector('#' + type)
         .content
         .querySelector('.' + type);
@@ -35,27 +35,34 @@
     messageWindow.addEventListener('click', onClick);
     document.addEventListener('keydown', onEscape);
 
-    if (type === ERROR) {
-      var closeButton = messageWindow.querySelector('.error__button');
+    return messageWindow;
+  };
 
-      closeButton.addEventListener('click', onCloseButtonClick);
+  var getSuccessMessage = function () {
+    var messageWindow = getMessage(SUCCESS);
+    return messageWindow;
+  };
 
-      if (message) {
-        var errorText = messageWindow.querySelector('.error__message');
-        errorText.textContent = message;
-      }
+  var getErrorMessage = function (message) {
+    var messageWindow = getMessage(ERROR);
+
+    var closeButton = messageWindow.querySelector('.error__button');
+    closeButton.addEventListener('click', onCloseButtonClick);
+
+    if (message) {
+      var errorText = messageWindow.querySelector('.error__message');
+      errorText.textContent = message;
     }
-
     return messageWindow;
   };
 
   var addSuccessMessage = function () {
-    var successWindow = getMessage(SUCCESS);
+    var successWindow = getSuccessMessage();
     main.appendChild(successWindow);
   };
 
   var addErrorMessage = function (message) {
-    var errorWindow = getMessage(ERROR, message);
+    var errorWindow = getErrorMessage(message);
     main.appendChild(errorWindow);
   };
 

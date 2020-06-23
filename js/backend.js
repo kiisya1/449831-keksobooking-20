@@ -10,45 +10,50 @@
     BAD_REQUEST: 400
   };
 
-  var makeRequest = function (method, url, onLoad, onError, data) {
-    var xhr = new XMLHttpRequest();
-
+  var addXhrLoadHandler = function (xhr, onLoad, onError) {
     xhr.addEventListener('load', function () {
-      switch (method) {
-        case 'GET':
-          var error;
-          switch (xhr.status) {
-            case StatusCode.OK:
-              try {
-                onLoad(JSON.parse(xhr.responseText));
-              } catch (err) {
-                onError('Ошибка данных: ' + err.message);
-              }
-              break;
-            case StatusCode.NOT_FOUND:
-              error = 'Ничего не найдено';
-              break;
-            case StatusCode.BAD_REQUEST:
-              error = 'Неверный запрос';
-              break;
-            default:
-              error = 'Статус ответа: ' + xhr.status + ' ' + xhr.statusText;
-          }
-
-          if (error) {
-            onError(error);
+      var error;
+      switch (xhr.status) {
+        case StatusCode.OK:
+          try {
+            onLoad(JSON.parse(xhr.responseText));
+          } catch (err) {
+            onError('Ошибка данных: ' + err.message);
           }
           break;
+        case StatusCode.NOT_FOUND:
+          error = 'Ничего не найдено';
+          break;
+        case StatusCode.BAD_REQUEST:
+          error = 'Неверный запрос';
+          break;
         default:
-          switch (xhr.status) {
-            case StatusCode.OK:
-              onLoad(JSON.parse(xhr.responseText));
-              break;
-            default:
-              onError();
-          }
+          error = 'Статус ответа: ' + xhr.status + ' ' + xhr.statusText;
+      }
+
+      if (error) {
+        onError(error);
       }
     });
+  };
+
+  var addXhrUploadHandler = function (xhr, onLoad, onError) {
+    xhr.addEventListener('load', function () {
+      switch (xhr.status) {
+        case StatusCode.OK:
+          onLoad(JSON.parse(xhr.responseText));
+          break;
+        default:
+          onError();
+      }
+    });
+  };
+
+
+  var makeRequest = function (method, url, onLoadHandler, onLoad, onError, data) {
+    var xhr = new XMLHttpRequest();
+
+    onLoadHandler(xhr, onLoad, onError);
 
     xhr.addEventListener('error', function () {
       onError('Произошла ошибка соединения');
@@ -68,12 +73,11 @@
   };
 
   var load = function (onLoad, onError) {
-    makeRequest('GET', LOAD_URL, onLoad, onError);
+    makeRequest('GET', LOAD_URL, addXhrLoadHandler, onLoad, onError);
   };
 
   var upload = function (data, onLoad, onError) {
-    makeRequest('POST', UPLOAD_URL, onLoad, onError, data);
-
+    makeRequest('POST', UPLOAD_URL, addXhrUploadHandler, onLoad, onError, data);
   };
 
   window.backend = {
