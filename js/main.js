@@ -52,6 +52,7 @@
 
   var onLoadAdsSuccess = function (ads) {
     renderPins(ads);
+    makeFilterActive(ads);
   };
 
   // Показывает ошибку, если что-то пошло не так
@@ -94,7 +95,6 @@
   var setActiveMode = function () {
     makeMapActive();
     makeAdFormActive();
-    makeFilterActive();
 
     setPinAddress(MAIN_PIN_WIDTH, MAIN_PIN_HEIGHT_ACTIVE);
     loadAds(onLoadAdsSuccess, onLoadAdsError);
