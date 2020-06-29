@@ -89,6 +89,8 @@
   };
 
   window.mapMethods = {
+    removePins: removePins,
+    removeAd: removeAd,
     renderPins: renderPins,
     activate: makeMapActive,
     deactivate: makeMapInactive
