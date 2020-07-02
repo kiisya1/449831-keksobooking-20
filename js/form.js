@@ -3,12 +3,18 @@
 (function () {
   var MIN_TITLE_LENGTH = 30;
   var MAX_TITLE_LENGTH = 100;
+  var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
 
   var map = document.querySelector('.map');
   var mainPin = map.querySelector('.map__pin--main');
 
   var adForm = document.querySelector('.ad-form');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
+
+  var avatarField = adForm.querySelector('#avatar');
+  var avatarPreview = adForm.querySelector('.ad-form-header__preview img');
+  var photoField = adForm.querySelector('#images');
+  var photoPreview = adForm.querySelector('.ad-form__photo');
 
   var titleField = adForm.querySelector('#title');
   var addressField = adForm.querySelector('#address');
@@ -190,6 +196,60 @@
     }
   };
 
+  // Проверяет, совпадает ли расширение файла
+
+  var isFileTypeOk = function (fileName) {
+    var matches = FILE_TYPES.some(function (it) {
+      return fileName.endsWith(it);
+    });
+
+    return matches;
+  };
+
+  // Добавляет превью загруженного изображения
+
+  var onImageChange = function (evt, makePreview) {
+    var file = evt.target.files[0];
+    var fileName = file.name.toLowerCase();
+
+    var matches = isFileTypeOk(fileName);
+
+    if (matches) {
+      var reader = new FileReader();
+
+      reader.addEventListener('load', function () {
+        makePreview(reader.result);
+      });
+
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Добавляет превью загруженного аватара
+
+  var makeAvatarPreview = function (result) {
+    avatarPreview.src = result;
+  };
+
+  // Добавляет превью загруженного фото
+
+  var makePhotoPreview = function (result) {
+    photoPreview.style.backgroundImage = 'url(' + result + ')';
+    photoPreview.style.backgroundSize = 'cover';
+  };
+
+  // Добавляет превью при изменении аватара
+
+  var onAvatarChange = function (evt) {
+    onImageChange(evt, makeAvatarPreview);
+  };
+
+  // Добавляет превью при изменении фото
+
+  var onPhotoChange = function (evt) {
+    onImageChange(evt, makePhotoPreview);
+  };
+
   // Переводит форму в активное состояние
 
   var makeAdFormActive = function () {
@@ -203,6 +263,8 @@
     priceField.addEventListener('input', onPriceInput);
     timeIn.addEventListener('change', onTimeInChange);
     timeOut.addEventListener('change', onTimeOutChange);
+    avatarField.addEventListener('change', onAvatarChange);
+    photoField.addEventListener('change', onPhotoChange);
   };
 
   // Переводит форму в неактивное состояние
@@ -221,6 +283,8 @@
     priceField.removeEventListener('input', onPriceInput);
     timeIn.removeEventListener('change', onTimeInChange);
     timeOut.removeEventListener('change', onTimeOutChange);
+    avatarField.removeEventListener('change', onAvatarChange);
+    photoField.removeEventListener('change', onPhotoChange);
   };
 
   // Добавляет адрес в поле адреса в соответствии с положением метки
